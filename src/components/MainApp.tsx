@@ -1,0 +1,43 @@
+import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import Sidebar from './layout/Sidebar';
+import AdminDashboard from './dashboard/AdminDashboard';
+import TeacherDashboard from './dashboard/TeacherDashboard';
+import StudentDashboard from './dashboard/StudentDashboard';
+import ParentDashboard from './dashboard/ParentDashboard';
+import PlaceholderView from './common/PlaceholderView';
+
+export default function MainApp() {
+  const { profile } = useAuth();
+  const [currentView, setCurrentView] = useState('dashboard');
+
+  const renderView = () => {
+    if (currentView === 'dashboard') {
+      switch (profile?.role) {
+        case 'admin':
+          return <AdminDashboard />;
+        case 'teacher':
+          return <TeacherDashboard />;
+        case 'student':
+          return <StudentDashboard />;
+        case 'parent':
+          return <ParentDashboard />;
+        default:
+          return <PlaceholderView title="Dashboard" />;
+      }
+    }
+
+    return <PlaceholderView title={currentView} />;
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar currentView={currentView} onViewChange={setCurrentView} />
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto p-8">
+          {renderView()}
+        </div>
+      </div>
+    </div>
+  );
+}
