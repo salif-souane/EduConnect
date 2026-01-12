@@ -6,6 +6,9 @@ import TeacherDashboard from './dashboard/TeacherDashboard';
 import StudentDashboard from './dashboard/StudentDashboard';
 import ParentDashboard from './dashboard/ParentDashboard';
 import PlaceholderView from './common/PlaceholderView';
+import UsersManagement from './dashboard/UsersManagement';
+import ClassesManagement from './dashboard/ClassesManagement';
+import SubjectsManagement from './dashboard/SubjectsManagement';
 
 export default function MainApp() {
   const { profile } = useAuth();
@@ -24,6 +27,25 @@ export default function MainApp() {
           return <ParentDashboard />;
         default:
           return <PlaceholderView title="Dashboard" />;
+      }
+    }
+
+    // Admin-specific views
+    if (profile?.role === 'admin') {
+      switch (currentView) {
+        case 'users':
+          return <UsersManagement />;
+        case 'classes':
+          return <ClassesManagement />;
+        case 'subjects':
+          return <SubjectsManagement />;
+        case 'schedules':
+        case 'announcements':
+        case 'statistics':
+        case 'messages':
+          return <PlaceholderView title={currentView} />;
+        default:
+          return <PlaceholderView title={currentView} />;
       }
     }
 
