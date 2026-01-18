@@ -1,18 +1,18 @@
 # Plan de développement - Fonctionnalités restantes
 
-## 1. Système d'annonces ✅ EN COURS
+## 1. Système d'annonces ✅ TERMINÉ
 - [x] Créer le composant AnnouncementsManagement pour admins/enseignants
 - [x] Créer le composant AnnouncementsView pour consulter les annonces
 - [x] Mettre à jour MainApp pour gérer la vue annonces
 - [x] Tester la fonctionnalité
 
-## 2. Messages privés
-- [ ] Créer le composant MessagesManagement pour la messagerie
-- [ ] Créer le composant MessageCompose pour rédiger des messages
-- [ ] Créer le composant MessageView pour lire les messages
-- [ ] Mettre à jour MainApp pour gérer les vues messages
+## 2. Messages privés ✅ TERMINÉ
+- [x] Créer le composant MessagesManagement pour la messagerie
+- [x] Créer le composant MessageCompose pour rédiger des messages
+- [x] Créer le composant MessageView pour lire les messages
+- [x] Mettre à jour MainApp pour gérer les vues messages
 
-## 3. Gestion des cours
+## 3. Gestion des cours ✅ EN COURS
 - [ ] Créer le composant CoursesManagement pour les enseignants
 - [ ] Créer le composant CoursesView pour les élèves
 - [ ] Créer le composant CourseDetail pour voir le contenu d'un cours

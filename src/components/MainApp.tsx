@@ -9,6 +9,8 @@ import PlaceholderView from './common/PlaceholderView';
 import UsersManagement from './dashboard/UsersManagement';
 import ClassesManagement from './dashboard/ClassesManagement';
 import SubjectsManagement from './dashboard/SubjectsManagement';
+import AnnouncementsManagement from './dashboard/AnnouncementsManagement';
+import AnnouncementsView from './dashboard/AnnouncementsView';
 
 export default function MainApp() {
   const { profile } = useAuth();
@@ -41,8 +43,11 @@ export default function MainApp() {
           return <SubjectsManagement />;
         case 'schedules':
         case 'announcements':
-        case 'statistics':
+        case 'announcements':
+          return <AnnouncementsManagement />;
         case 'messages':
+          return <MessagesManagement />;
+        case 'statistics':
           return <PlaceholderView title={currentView} />;
         default:
           return <PlaceholderView title={currentView} />;

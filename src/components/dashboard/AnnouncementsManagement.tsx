@@ -36,7 +36,7 @@ export default function AnnouncementsManagement() {
   // Form state
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [targetRole, setTargetRole] = useState<string>('all');
+  const [targetRole, setTargetRole] = useState<string | null>('all');
   const [targetClassId, setTargetClassId] = useState<string>('');
 
   useEffect(() => {
