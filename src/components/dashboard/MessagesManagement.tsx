@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { MessageSquare, Send, Inbox, Eye, EyeOff, Trash2, Plus } from 'lucide-react';
+import { MessageSquare, Send, Eye, Trash2, Plus } from 'lucide-react';
 
 type Message = {
   id: string;
@@ -95,12 +95,13 @@ export default function MessagesManagement() {
     try {
       const { error } = await supabase
         .from('messages')
+        // @ts-expect-error Supabase type generation issue
         .insert({
           sender_id: user.id,
           recipient_id: recipientId,
           subject,
           content,
-        } as any);
+        });
 
       if (error) throw error;
 
@@ -110,19 +111,22 @@ export default function MessagesManagement() {
       setSubject('');
       setContent('');
       alert('Message envoyé avec succès');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending message:', error);
-      alert('Erreur lors de l\'envoi: ' + (error.message || error));
+      const message = error instanceof Error ? error.message : String(error);
+      alert('Erreur lors de l\'envoi: ' + message);
     }
   };
 
   const markAsRead = async (messageId: string) => {
+    if (!user?.id) return;
     try {
       const { error } = await supabase
         .from('messages')
+        // @ts-expect-error Supabase type generation issue
         .update({ read: true, read_at: new Date().toISOString() })
         .eq('id', messageId)
-        .eq('recipient_id', user?.id);
+        .eq('recipient_id', user.id);
 
       if (error) throw error;
 
@@ -178,10 +182,11 @@ export default function MessagesManagement() {
           <h3 className="text-lg font-semibold mb-4">Nouveau message</h3>
           <form onSubmit={sendMessage} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="recipient-select" className="block text-sm font-medium text-gray-700 mb-1">
                 Destinataire
               </label>
               <select
+                id="recipient-select"
                 value={recipientId}
                 onChange={(e) => setRecipientId(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -197,10 +202,11 @@ export default function MessagesManagement() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="message-subject" className="block text-sm font-medium text-gray-700 mb-1">
                 Sujet
               </label>
               <input
+                id="message-subject"
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
@@ -210,10 +216,11 @@ export default function MessagesManagement() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="message-content" className="block text-sm font-medium text-gray-700 mb-1">
                 Message
               </label>
               <textarea
+                id="message-content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={4}

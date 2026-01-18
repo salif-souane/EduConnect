@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { Bell, Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Bell, Plus, Edit, Trash2 } from 'lucide-react';
 
 type Announcement = {
   id: string;
@@ -97,6 +97,21 @@ export default function AnnouncementsManagement() {
     setShowForm(true);
   };
 
+  const getTargetRoleLabel = (role: string) => {
+    switch (role) {
+      case 'all':
+        return 'Tous';
+      case 'student':
+        return 'Élèves';
+      case 'teacher':
+        return 'Enseignants';
+      case 'parent':
+        return 'Parents';
+      default:
+        return role;
+    }
+  };
+
   const createAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -113,12 +128,14 @@ export default function AnnouncementsManagement() {
       if (editingId) {
         const { error } = await supabase
           .from('announcements')
+          // @ts-expect-error Supabase type generation issue
           .update(announcementData)
           .eq('id', editingId);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('announcements')
+          // @ts-expect-error Supabase type generation issue
           .insert(announcementData);
         if (error) throw error;
       }
@@ -126,9 +143,10 @@ export default function AnnouncementsManagement() {
       await loadData();
       resetForm();
       alert(editingId ? 'Annonce mise à jour avec succès' : 'Annonce créée avec succès');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving announcement:', error);
-      alert('Erreur lors de la sauvegarde: ' + (error.message || error));
+      const message = error instanceof Error ? error.message : String(error);
+      alert('Erreur lors de la sauvegarde: ' + message);
     }
   };
 
@@ -144,9 +162,10 @@ export default function AnnouncementsManagement() {
 
       setAnnouncements(announcements.filter(a => a.id !== id));
       alert('Annonce supprimée avec succès');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting announcement:', error);
-      alert('Erreur lors de la suppression: ' + (error.message || error));
+      const message = error instanceof Error ? error.message : String(error);
+      alert('Erreur lors de la suppression: ' + message);
     }
   };
 
@@ -182,10 +201,11 @@ export default function AnnouncementsManagement() {
           </h3>
           <form onSubmit={createAnnouncement} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="announcement-title" className="block text-sm font-medium text-gray-700 mb-1">
                 Titre
               </label>
               <input
+                id="announcement-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -195,10 +215,11 @@ export default function AnnouncementsManagement() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="announcement-content" className="block text-sm font-medium text-gray-700 mb-1">
                 Contenu
               </label>
               <textarea
+                id="announcement-content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={4}
@@ -209,12 +230,13 @@ export default function AnnouncementsManagement() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="announcement-role" className="block text-sm font-medium text-gray-700 mb-1">
                   Destinataires
                 </label>
                 <select
-                  value={targetRole}
-                  onChange={(e) => setTargetRole(e.target.value as any)}
+                  id="announcement-role"
+                  value={targetRole || ''}
+                  onChange={(e) => setTargetRole(e.target.value || null)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="all">Tous</option>
@@ -225,10 +247,11 @@ export default function AnnouncementsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="announcement-class" className="block text-sm font-medium text-gray-700 mb-1">
                   Classe spécifique (optionnel)
                 </label>
                 <select
+                  id="announcement-class"
                   value={targetClassId}
                   onChange={(e) => setTargetClassId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -287,9 +310,7 @@ export default function AnnouncementsManagement() {
                       {announcement.title}
                     </h3>
                     <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full capitalize">
-                      {announcement.target_role === 'all' ? 'Tous' :
-                       announcement.target_role === 'student' ? 'Élèves' :
-                       announcement.target_role === 'teacher' ? 'Enseignants' : 'Parents'}
+                      {getTargetRoleLabel(announcement.target_role)}
                     </span>
                     {announcement.classes && (
                       <span className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">

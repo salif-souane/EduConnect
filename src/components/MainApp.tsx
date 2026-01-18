@@ -10,7 +10,7 @@ import UsersManagement from './dashboard/UsersManagement';
 import ClassesManagement from './dashboard/ClassesManagement';
 import SubjectsManagement from './dashboard/SubjectsManagement';
 import AnnouncementsManagement from './dashboard/AnnouncementsManagement';
-import AnnouncementsView from './dashboard/AnnouncementsView';
+import MessagesManagement from './dashboard/MessagesManagement';
 
 export default function MainApp() {
   const { profile } = useAuth();
@@ -42,7 +42,6 @@ export default function MainApp() {
         case 'subjects':
           return <SubjectsManagement />;
         case 'schedules':
-        case 'announcements':
         case 'announcements':
           return <AnnouncementsManagement />;
         case 'messages':
