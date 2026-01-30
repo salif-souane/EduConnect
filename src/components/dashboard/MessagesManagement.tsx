@@ -78,7 +78,7 @@ export default function MessagesManagement() {
 
       if (error) throw error;
 
-      const userList = (data || []).map((u: any) => ({
+      const userList = (data || []).map((u: { id: string; first_name: string; last_name: string }) => ({
         id: u.id,
         name: `${u.first_name} ${u.last_name}`
       }));

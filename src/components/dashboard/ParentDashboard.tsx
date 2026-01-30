@@ -42,7 +42,7 @@ export default function ParentDashboard() {
 
       if (error) throw error;
 
-      const formattedChildren = data?.map((item: any) => ({
+      const formattedChildren = data?.map((item) => ({
         id: item.students.id,
         profiles: item.students.profiles,
         classes: item.students.classes,

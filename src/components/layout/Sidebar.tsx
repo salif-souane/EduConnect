@@ -50,10 +50,11 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
       case 'student':
         return [
           { id: 'dashboard', label: 'Tableau de bord', icon: Home },
-          { id: 'schedule', label: 'Emploi du temps', icon: Calendar },
+          { id: 'schedules', label: 'Emploi du temps', icon: Calendar },
           { id: 'courses', label: 'Cours', icon: BookOpen },
           { id: 'assignments', label: 'Devoirs', icon: ClipboardList },
           { id: 'grades', label: 'Notes', icon: GraduationCap },
+          { id: 'announcements', label: 'Annonces', icon: Bell },
           { id: 'forums', label: 'Forums', icon: MessageSquare },
           { id: 'messages', label: 'Messages', icon: MessageSquare },
         ];
@@ -61,9 +62,10 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
         return [
           { id: 'dashboard', label: 'Tableau de bord', icon: Home },
           { id: 'children', label: 'Mes enfants', icon: Users },
-          { id: 'schedule', label: 'Emploi du temps', icon: Calendar },
+          { id: 'schedules', label: 'Emploi du temps', icon: Calendar },
           { id: 'grades', label: 'Notes', icon: GraduationCap },
           { id: 'announcements', label: 'Annonces', icon: Bell },
+          { id: 'forums', label: 'Forums', icon: MessageSquare },
           { id: 'messages', label: 'Messages', icon: MessageSquare },
           { id: 'appointments', label: 'Rendez-vous', icon: Calendar },
         ];

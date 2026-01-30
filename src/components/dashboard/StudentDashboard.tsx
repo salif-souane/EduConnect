@@ -19,7 +19,11 @@ export default function StudentDashboard() {
     upcomingAssignments: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [studentData, setStudentData] = useState<any>(null);
+  const [studentData, setStudentData] = useState<{
+    id: string;
+    class_id: string | null;
+    classes: { id: string; name: string } | null;
+  } | null>(null);
 
   useEffect(() => {
     if (user) {

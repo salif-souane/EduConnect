@@ -10,7 +10,18 @@ import UsersManagement from './dashboard/UsersManagement';
 import ClassesManagement from './dashboard/ClassesManagement';
 import SubjectsManagement from './dashboard/SubjectsManagement';
 import AnnouncementsManagement from './dashboard/AnnouncementsManagement';
+import AnnouncementsView from './dashboard/AnnouncementsView';
 import MessagesManagement from './dashboard/MessagesManagement';
+import CoursesManagement from './dashboard/CoursesManagement';
+import CoursesView from './dashboard/CoursesView';
+import AssignmentsManagement from './dashboard/AssignmentsManagement';
+import AssignmentsView from './dashboard/AssignmentsView';
+import GradesManagement from './dashboard/GradesManagement';
+import GradesView from './dashboard/GradesView';
+import ScheduleManagement from './dashboard/ScheduleManagement';
+import ScheduleView from './dashboard/ScheduleView';
+import ForumsManagement from './dashboard/ForumsManagement';
+import ForumsView from './dashboard/ForumsView';
 
 export default function MainApp() {
   const { profile } = useAuth();
@@ -42,12 +53,79 @@ export default function MainApp() {
         case 'subjects':
           return <SubjectsManagement />;
         case 'schedules':
+          return <ScheduleManagement />;
         case 'announcements':
           return <AnnouncementsManagement />;
         case 'messages':
           return <MessagesManagement />;
+        case 'forums':
+          return <ForumsManagement />;
         case 'statistics':
           return <PlaceholderView title={currentView} />;
+        default:
+          return <PlaceholderView title={currentView} />;
+      }
+    }
+
+    // Teacher-specific views
+    if (profile?.role === 'teacher') {
+      switch (currentView) {
+        case 'courses':
+          return <CoursesManagement />;
+        case 'assignments':
+          return <AssignmentsManagement />;
+        case 'grades':
+          return <GradesManagement />;
+        case 'announcements':
+          return <AnnouncementsManagement />;
+        case 'messages':
+          return <MessagesManagement />;
+        case 'forums':
+          return <ForumsManagement />;
+        case 'statistics':
+          return <PlaceholderView title={currentView} />;
+        default:
+          return <PlaceholderView title={currentView} />;
+      }
+    }
+
+    // Student-specific views
+    if (profile?.role === 'student') {
+      switch (currentView) {
+        case 'courses':
+          return <CoursesView />;
+        case 'assignments':
+          return <AssignmentsView />;
+        case 'grades':
+          return <GradesView />;
+        case 'schedules':
+          return <ScheduleView />;
+        case 'messages':
+          return <MessagesManagement />;
+        case 'announcements':
+          return <AnnouncementsView />;
+        case 'forums':
+          return <ForumsView />;
+        default:
+          return <PlaceholderView title={currentView} />;
+      }
+    }
+
+    // Parent-specific views
+    if (profile?.role === 'parent') {
+      switch (currentView) {
+        case 'children':
+          return <PlaceholderView title="Suivi des enfants" />;
+        case 'grades':
+          return <GradesView />;
+        case 'messages':
+          return <MessagesManagement />;
+        case 'schedules':
+          return <ScheduleView />;
+        case 'announcements':
+          return <AnnouncementsView />;
+        case 'forums':
+          return <ForumsView />;
         default:
           return <PlaceholderView title={currentView} />;
       }

@@ -1,14 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
+import type { Database, UserRole } from '../../lib/database.types';
 
-type Profile = {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  created_at: string;
-};
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export default function UsersManagement() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -17,20 +11,16 @@ export default function UsersManagement() {
   const [password, setPassword] = useState('Demo123!');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [role, setRole] = useState<'admin' | 'teacher' | 'student' | 'parent'>('student');
+  const [role, setRole] = useState<UserRole>('student');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFirstName, setEditFirstName] = useState('');
   const [editLastName, setEditLastName] = useState('');
-  const [editRole, setEditRole] = useState<'admin' | 'teacher' | 'student' | 'parent'>('student');
+  const [editRole, setEditRole] = useState<UserRole>('student');
 
-  useEffect(() => {
-    loadProfiles(page);
-  }, [page, pageSize]);
-
-  const loadProfiles = async (pageNumber = 1) => {
+  const loadProfiles = useCallback(async (pageNumber = 1) => {
     setLoading(true);
     try {
       // get total count
@@ -40,7 +30,11 @@ export default function UsersManagement() {
 
       const from = (pageNumber - 1) * pageSize;
       const to = from + pageSize - 1;
-      const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false }).range(from, to);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(from, to);
       if (error) throw error;
       setProfiles(data || []);
     } catch (err) {
@@ -48,46 +42,52 @@ export default function UsersManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pageSize]);
+
+  useEffect(() => {
+    loadProfiles(page);
+  }, [page, loadProfiles]);
 
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       // Create auth user
-      const { data: signData, error: signError } = await supabase.auth.signUp({ email, password });
+      const { data: signData, error: signError } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            role,
+          }
+        }
+      });
       if (signError) throw signError;
 
       const userId = signData?.user?.id;
       if (!userId) throw new Error('User not returned from signUp');
 
-      // Insert profile
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: userId,
-        email,
-        first_name: firstName || '',
-        last_name: lastName || '',
-        role,
-      });
+      // Upsert profile (update if exists, insert if not)
+      const { error: profileError } = await supabase.from('profiles').upsert(
+        {
+          id: userId,
+          email,
+          first_name: firstName || '',
+          last_name: lastName || '',
+          role,
+        },
+        { onConflict: 'id', ignoreDuplicates: false }
+      );
       if (profileError) throw profileError;
 
       // Refresh list
       await loadProfiles(1);
       setEmail(''); setPassword('Demo123!'); setFirstName(''); setLastName(''); setRole('student');
       alert("Utilisateur créé. S'il y a une confirmation d'email activée, confirmez le compte via Dashboard.");
-    } catch (err: any) {
-      console.error('Error creating user:', err);
-      alert('Erreur lors de la création de l\'utilisateur: ' + (err.message || err));
-    }
-  };
-
-  const updateRole = async (id: string, newRole: string) => {
-    try {
-      const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', id);
-      if (error) throw error;
-      setProfiles((p) => p.map((x) => (x.id === id ? { ...x, role: newRole } : x)));
     } catch (err) {
-      console.error('Error updating role:', err);
-      alert('Impossible de mettre à jour le rôle. Voir la console.');
+      console.error('Error creating user:', err);
+      alert('Erreur lors de la création de l\'utilisateur: ' + (err instanceof Error ? err.message : err));
     }
   };
 
@@ -107,7 +107,7 @@ export default function UsersManagement() {
     setEditingId(p.id);
     setEditFirstName(p.first_name);
     setEditLastName(p.last_name);
-    setEditRole(p.role as any);
+    setEditRole(p.role);
   };
 
   const cancelEdit = () => {
@@ -116,9 +116,22 @@ export default function UsersManagement() {
 
   const saveEdit = async (id: string) => {
     try {
-      const { error } = await supabase.from('profiles').update({ first_name: editFirstName, last_name: editLastName, role: editRole }).eq('id', id);
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: editFirstName,
+          last_name: editLastName,
+          role: editRole,
+        })
+        .eq('id', id);
       if (error) throw error;
-      setProfiles((p) => p.map((x) => (x.id === id ? { ...x, first_name: editFirstName, last_name: editLastName, role: editRole } : x)));
+      setProfiles((p) =>
+        p.map((x) =>
+          x.id === id
+            ? { ...x, first_name: editFirstName, last_name: editLastName, role: editRole }
+            : x
+        )
+      );
       setEditingId(null);
     } catch (err) {
       console.error('Error saving profile:', err);
@@ -141,7 +154,7 @@ export default function UsersManagement() {
         <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Prénom" required className="px-3 py-2 border rounded" />
         <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Nom" required className="px-3 py-2 border rounded" />
         <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" type="email" required className="px-3 py-2 border rounded" />
-        <select value={role} onChange={(e) => setRole(e.target.value as any)} className="px-3 py-2 border rounded">
+        <select value={role} onChange={(e) => setRole(e.target.value as UserRole)} className="px-3 py-2 border rounded">
           <option value="student">Élève</option>
           <option value="teacher">Enseignant</option>
           <option value="parent">Parent</option>
@@ -153,8 +166,13 @@ export default function UsersManagement() {
       <div className="mb-4 flex items-center justify-between">
         <div className="text-sm text-gray-600">Total: {totalCount}</div>
         <div className="flex items-center space-x-2">
-          <label className="text-sm">Par page:</label>
-          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }} className="px-2 py-1 border rounded">
+          <label htmlFor="pageSize" className="text-sm">Par page:</label>
+          <select 
+            id="pageSize"
+            value={pageSize} 
+            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }} 
+            className="px-2 py-1 border rounded"
+          >
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -192,7 +210,7 @@ export default function UsersManagement() {
                 <td className="py-3">{p.email}</td>
                 <td className="py-3">
                   {editingId === p.id ? (
-                    <select value={editRole} onChange={(e) => setEditRole(e.target.value as any)} className="capitalize px-2 py-1 border rounded">
+                    <select value={editRole} onChange={(e) => setEditRole(e.target.value as UserRole)} className="capitalize px-2 py-1 border rounded">
                       <option value="admin">admin</option>
                       <option value="teacher">teacher</option>
                       <option value="student">student</option>

@@ -9,6 +9,15 @@ interface Stats {
   totalStudents: number;
 }
 
+interface Profile {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  created_at: string;
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
@@ -16,6 +25,7 @@ export default function AdminDashboard() {
     totalSubjects: 0,
     totalStudents: 0,
   });
+  const [recentUsers, setRecentUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,11 +34,16 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const [usersRes, classesRes, subjectsRes, studentsRes] = await Promise.all([
+      const [usersRes, classesRes, subjectsRes, studentsRes, recentUsersRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('classes').select('id', { count: 'exact', head: true }),
         supabase.from('subjects').select('id', { count: 'exact', head: true }),
         supabase.from('students').select('id', { count: 'exact', head: true }),
+        supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5),
       ]);
 
       setStats({
@@ -37,6 +52,7 @@ export default function AdminDashboard() {
         totalSubjects: subjectsRes.count || 0,
         totalStudents: studentsRes.count || 0,
       });
+      setRecentUsers(recentUsersRes.data || []);
     } catch (error) {
       console.error('Error loading stats:', error);
     } finally {
@@ -116,13 +132,25 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Activité récente
+            Utilisateurs récents
           </h3>
-          <div className="space-y-3">
-            <p className="text-gray-600 text-sm">
-              Utilisez le menu de navigation pour gérer les utilisateurs, les classes et les matières.
-            </p>
-          </div>
+          {recentUsers.length === 0 ? (
+            <p className="text-gray-600 text-sm">Aucun utilisateur créé pour le moment</p>
+          ) : (
+            <div className="space-y-3">
+              {recentUsers.map((user) => (
+                <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">{user.first_name} {user.last_name}</p>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                  </div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 capitalize">
+                    {user.role}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
