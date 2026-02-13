@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import {
   Box,
-  Grid,
   Paper,
   Typography,
   Card,
@@ -14,8 +13,6 @@ import {
   Skeleton,
   Stack,
   Divider,
-  IconButton,
-  Tooltip,
   Container
 } from '@mui/material';
 import {
@@ -23,11 +20,10 @@ import {
   School as SchoolIcon,
   MenuBook as MenuBookIcon,
   TrendingUp as TrendingUpIcon,
-  Add as AddIcon,
-  PersonAdd as PersonAddIcon,
-  GroupAdd as GroupAddIcon,
   ArrowForward as ArrowForwardIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  PersonAdd as PersonAddIcon,
+  GroupAdd as GroupAddIcon
 } from '@mui/icons-material';
 
 interface Stats {
@@ -139,42 +135,49 @@ export default function AdminDashboard() {
         <Skeleton variant="text" width="60%" height={60} sx={{ mb: 2 }} />
         <Skeleton variant="text" width="40%" height={30} sx={{ mb: 4 }} />
         
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: 3,
+            mb: 4,
+          }}
+        >
           {[1, 2, 3, 4].map((item) => (
-            <Grid item xs={12} sm={6} md={3} key={item}>
-              <Card>
+            <Card key={item}>
                 <CardContent>
                   <Skeleton variant="circular" width={56} height={56} sx={{ mb: 2 }} />
                   <Skeleton variant="text" height={40} sx={{ mb: 1 }} />
                   <Skeleton variant="text" width="60%" />
                 </CardContent>
               </Card>
-            </Grid>
-          ))}
-        </Grid>
+            ))}
+        </Box>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Skeleton variant="text" width="40%" height={30} sx={{ mb: 3 }} />
-                {[1, 2, 3].map((item) => (
-                  <Skeleton key={item} variant="rectangular" height={80} sx={{ mb: 2, borderRadius: 1 }} />
-                ))}
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Skeleton variant="text" width="40%" height={30} sx={{ mb: 3 }} />
-                {[1, 2].map((item) => (
-                  <Skeleton key={item} variant="rectangular" height={100} sx={{ mb: 2, borderRadius: 1 }} />
-                ))}
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: 3,
+          }}
+        >
+          <Card>
+            <CardContent>
+              <Skeleton variant="text" width="40%" height={30} sx={{ mb: 3 }} />
+              {[1, 2, 3].map((item) => (
+                <Skeleton key={item} variant="rectangular" height={80} sx={{ mb: 2, borderRadius: 1 }} />
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <Skeleton variant="text" width="40%" height={30} sx={{ mb: 3 }} />
+              {[1, 2].map((item) => (
+                <Skeleton key={item} variant="rectangular" height={100} sx={{ mb: 2, borderRadius: 1 }} />
+              ))}
+            </CardContent>
+          </Card>
+        </Box>
       </Container>
     );
   }
@@ -192,60 +195,71 @@ export default function AdminDashboard() {
       </Box>
 
       {/* Cartes de statistiques */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: 3,
+          mb: 4,
+        }}
+      >
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <Grid item xs={12} sm={6} md={3} key={card.title}>
-              <Card 
-                sx={{ 
-                  height: '100%',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 6
-                  }
-                }}
-              >
-                <CardContent>
-                  <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                    <Avatar
-                      sx={{
-                        bgcolor: card.bgColor,
-                        color: card.color,
-                        width: 56,
-                        height: 56
-                      }}
-                    >
-                      <Icon fontSize="medium" />
-                    </Avatar>
-                    <Chip
-                      icon={<TrendingUpIcon />}
-                      label={card.trend}
-                      size="small"
-                      color="success"
-                      variant="outlined"
-                    />
-                  </Stack>
-                  
-                  <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>
-                    {card.value.toLocaleString()}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {card.title}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+            <Card 
+              key={card.title}
+              sx={{ 
+                height: '100%',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 6
+                }
+              }}
+            >
+              <CardContent>
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                  <Avatar
+                    sx={{
+                      bgcolor: card.bgColor,
+                      color: card.color,
+                      width: 56,
+                      height: 56
+                    }}
+                  >
+                    <Icon fontSize="medium" />
+                  </Avatar>
+                  <Chip
+                    icon={<TrendingUpIcon />}
+                    label={card.trend}
+                    size="small"
+                    color="success"
+                    variant="outlined"
+                  />
+                </Stack>
+                
+                <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>
+                  {card.value.toLocaleString()}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {card.title}
+                </Typography>
+              </CardContent>
+            </Card>
           );
         })}
-      </Grid>
+      </Box>
 
       {/* Section inférieure */}
-      <Grid container spacing={3}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: '1.4fr 1fr' },
+          gap: 3,
+        }}
+      >
         {/* Utilisateurs récents */}
-        <Grid item xs={12} md={7}>
-          <Card sx={{ height: '100%' }}>
+        <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
                 Utilisateurs récents
@@ -319,11 +333,9 @@ export default function AdminDashboard() {
               </Button>
             </CardActions>
           </Card>
-        </Grid>
 
         {/* Actions rapides */}
-        <Grid item xs={12} md={5}>
-          <Card sx={{ height: '100%' }}>
+        <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
                 Actions rapides
@@ -374,29 +386,27 @@ export default function AdminDashboard() {
                   </Typography>
                 </Divider>
                 
-                <Grid container spacing={1}>
+                <Stack spacing={1}>
                   {[
                     { label: 'Gérer les matières', icon: <MenuBookIcon />, color: 'warning' },
                     { label: 'Voir les statistiques', icon: <TrendingUpIcon />, color: 'info' },
                     { label: 'Modérer les contenus', icon: <SchoolIcon />, color: 'secondary' },
                   ].map((action) => (
-                    <Grid item xs={12} key={action.label}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        startIcon={action.icon}
-                        sx={{ justifyContent: 'flex-start' }}
-                      >
-                        {action.label}
-                      </Button>
-                    </Grid>
+                    <Button
+                      key={action.label}
+                      fullWidth
+                      variant="outlined"
+                      startIcon={action.icon}
+                      sx={{ justifyContent: 'flex-start' }}
+                    >
+                      {action.label}
+                    </Button>
                   ))}
-                </Grid>
+                </Stack>
               </Stack>
             </CardContent>
           </Card>
-        </Grid>
-      </Grid>
-    </Container>
+        </Box>
+      </Container>
   );
 }
