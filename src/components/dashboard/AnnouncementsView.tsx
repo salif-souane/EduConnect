@@ -20,6 +20,10 @@ type Announcement = {
   };
 };
 
+type StudentData = {
+  class_id: string | null;
+};
+
 export default function AnnouncementsView() {
   const { user, profile } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -55,9 +59,9 @@ export default function AnnouncementsView() {
           .from('students')
           .select('class_id')
           .eq('id', user.id)
-          .single();
+          .single<StudentData>();
 
-        if (studentData?.class_id) {
+        if (studentData && studentData.class_id) {
           query = query.or(`target_class_id.is.null,target_class_id.eq.${studentData.class_id}`);
         } else {
           query = query.is('target_class_id', null);
