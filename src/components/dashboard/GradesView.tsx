@@ -80,8 +80,8 @@ export default function GradesView() {
     return 'À améliorer';
   };
 
-  const calculateAverage = () => {
-    if (grades.length === 0) return 0;
+  const calculateAverage = (): string => {
+    if (grades.length === 0) return '0';
     const sum = grades.reduce((acc, g) => acc + g.grade, 0);
     return (sum / grades.length).toFixed(2);
   };
