@@ -21,6 +21,10 @@ type Schedule = {
   };
 };
 
+type StudentData = {
+  class_id: string | null;
+};
+
 const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
 export default function ScheduleView() {
@@ -37,11 +41,10 @@ export default function ScheduleView() {
       }
 
       // Get student's class
-      const { data: studentData } = await supabase
-        .from('students')
-        .select('class_id')
-        .eq('id', user.id)
-        .single();
+      // @ts-ignore
+      const result = await supabase.from('students').select('class_id').eq('id', user.id).single() as { data: StudentData | null; error: any };
+      
+      const studentData = result.data;
 
       if (!studentData || !studentData.class_id) {
         setLoading(false);
@@ -145,9 +148,9 @@ export default function ScheduleView() {
                           <p className="text-gray-700">
                             <span className="font-medium">Professeur:</span> {schedule.profiles?.first_name} {schedule.profiles?.last_name}
                           </p>
-                          {schedule.room_number && (
+                          {schedule.room && (
                             <p className="text-gray-600">
-                              <span className="font-medium">Salle:</span> {schedule.room_number}
+                              <span className="font-medium">Salle:</span> {schedule.room}
                             </p>
                           )}
                         </div>
