@@ -1,6 +1,34 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Users, School, BookOpen, TrendingUp } from 'lucide-react';
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Avatar,
+  Chip,
+  Skeleton,
+  Stack,
+  Divider,
+  IconButton,
+  Tooltip,
+  Container
+} from '@mui/material';
+import {
+  People as PeopleIcon,
+  School as SchoolIcon,
+  MenuBook as MenuBookIcon,
+  TrendingUp as TrendingUpIcon,
+  Add as AddIcon,
+  PersonAdd as PersonAddIcon,
+  GroupAdd as GroupAddIcon,
+  ArrowForward as ArrowForwardIcon,
+  Person as PersonIcon
+} from '@mui/icons-material';
 
 interface Stats {
   totalUsers: number;
@@ -64,111 +92,311 @@ export default function AdminDashboard() {
     {
       title: 'Utilisateurs totaux',
       value: stats.totalUsers,
-      icon: Users,
-      color: 'bg-blue-500',
+      icon: PeopleIcon,
+      color: 'primary.main',
+      bgColor: 'primary.light',
+      trend: '+12%',
     },
     {
       title: 'Élèves',
       value: stats.totalStudents,
-      icon: Users,
-      color: 'bg-green-500',
+      icon: PersonIcon,
+      color: 'success.main',
+      bgColor: 'success.light',
+      trend: '+8%',
     },
     {
       title: 'Classes',
       value: stats.totalClasses,
-      icon: School,
-      color: 'bg-orange-500',
+      icon: SchoolIcon,
+      color: 'warning.main',
+      bgColor: 'warning.light',
+      trend: '+5%',
     },
     {
       title: 'Matières',
       value: stats.totalSubjects,
-      icon: BookOpen,
-      color: 'bg-purple-500',
+      icon: MenuBookIcon,
+      color: 'secondary.main',
+      bgColor: 'secondary.light',
+      trend: '+3%',
     },
   ];
 
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'admin': return 'error';
+      case 'enseignant': return 'primary';
+      case 'eleve': return 'success';
+      case 'parent': return 'warning';
+      default: return 'default';
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <Container maxWidth="xl">
+        <Skeleton variant="text" width="60%" height={60} sx={{ mb: 2 }} />
+        <Skeleton variant="text" width="40%" height={30} sx={{ mb: 4 }} />
+        
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          {[1, 2, 3, 4].map((item) => (
+            <Grid item xs={12} sm={6} md={3} key={item}>
+              <Card>
+                <CardContent>
+                  <Skeleton variant="circular" width={56} height={56} sx={{ mb: 2 }} />
+                  <Skeleton variant="text" height={40} sx={{ mb: 1 }} />
+                  <Skeleton variant="text" width="60%" />
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Skeleton variant="text" width="40%" height={30} sx={{ mb: 3 }} />
+                {[1, 2, 3].map((item) => (
+                  <Skeleton key={item} variant="rectangular" height={80} sx={{ mb: 2, borderRadius: 1 }} />
+                ))}
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Skeleton variant="text" width="40%" height={30} sx={{ mb: 3 }} />
+                {[1, 2].map((item) => (
+                  <Skeleton key={item} variant="rectangular" height={100} sx={{ mb: 2, borderRadius: 1 }} />
+                ))}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
     );
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* En-tête */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
           Tableau de bord administrateur
-        </h2>
-        <p className="text-gray-600">
-          Vue d'ensemble de la plateforme éducative
-        </p>
-      </div>
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Vue d'ensemble de la plateforme éducative et statistiques
+        </Typography>
+      </Box>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Cartes de statistiques */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <div
-              key={card.title}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`${card.color} p-3 rounded-lg`}>
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
-                <TrendingUp className="w-5 h-5 text-green-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                {card.value}
-              </h3>
-              <p className="text-sm text-gray-600">{card.title}</p>
-            </div>
+            <Grid item xs={12} sm={6} md={3} key={card.title}>
+              <Card 
+                sx={{ 
+                  height: '100%',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 6
+                  }
+                }}
+              >
+                <CardContent>
+                  <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                    <Avatar
+                      sx={{
+                        bgcolor: card.bgColor,
+                        color: card.color,
+                        width: 56,
+                        height: 56
+                      }}
+                    >
+                      <Icon fontSize="medium" />
+                    </Avatar>
+                    <Chip
+                      icon={<TrendingUpIcon />}
+                      label={card.trend}
+                      size="small"
+                      color="success"
+                      variant="outlined"
+                    />
+                  </Stack>
+                  
+                  <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>
+                    {card.value.toLocaleString()}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {card.title}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
           );
         })}
-      </div>
+      </Grid>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Utilisateurs récents
-          </h3>
-          {recentUsers.length === 0 ? (
-            <p className="text-gray-600 text-sm">Aucun utilisateur créé pour le moment</p>
-          ) : (
-            <div className="space-y-3">
-              {recentUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-900">{user.first_name} {user.last_name}</p>
-                    <p className="text-sm text-gray-600">{user.email}</p>
-                  </div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 capitalize">
-                    {user.role}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Section inférieure */}
+      <Grid container spacing={3}>
+        {/* Utilisateurs récents */}
+        <Grid item xs={12} md={7}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
+                Utilisateurs récents
+              </Typography>
+              
+              {recentUsers.length === 0 ? (
+                <Paper
+                  sx={{
+                    p: 4,
+                    textAlign: 'center',
+                    bgcolor: 'action.hover',
+                    borderRadius: 2
+                  }}
+                >
+                  <PeopleIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                  <Typography color="text.secondary">
+                    Aucun utilisateur créé pour le moment
+                  </Typography>
+                </Paper>
+              ) : (
+                <Stack spacing={2}>
+                  {recentUsers.map((user) => (
+                    <Paper
+                      key={user.id}
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'background-color 0.2s',
+                        '&:hover': {
+                          bgcolor: 'action.hover'
+                        }
+                      }}
+                    >
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Avatar sx={{ bgcolor: 'primary.main' }}>
+                          {user.first_name?.[0]?.toUpperCase()}
+                          {user.last_name?.[0]?.toUpperCase()}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle1" fontWeight="medium">
+                            {user.first_name} {user.last_name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {user.email}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      
+                      <Chip
+                        label={user.role}
+                        color={getRoleColor(user.role)}
+                        variant="outlined"
+                        size="small"
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                    </Paper>
+                  ))}
+                </Stack>
+              )}
+            </CardContent>
+            <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+              <Button 
+                endIcon={<ArrowForwardIcon />}
+                variant="text"
+                color="primary"
+              >
+                Voir tous les utilisateurs
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Actions rapides
-          </h3>
-          <div className="space-y-2">
-            <button className="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
-              <p className="font-medium text-blue-900">Ajouter un utilisateur</p>
-              <p className="text-sm text-blue-700">Créer un nouveau compte</p>
-            </button>
-            <button className="w-full text-left px-4 py-3 bg-green-50 hover:bg-green-100 rounded-lg transition">
-              <p className="font-medium text-green-900">Créer une classe</p>
-              <p className="text-sm text-green-700">Ajouter une nouvelle classe</p>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+        {/* Actions rapides */}
+        <Grid item xs={12} md={5}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
+                Actions rapides
+              </Typography>
+              
+              <Stack spacing={2}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  startIcon={<PersonAddIcon />}
+                  sx={{
+                    py: 2,
+                    justifyContent: 'flex-start',
+                    textAlign: 'left'
+                  }}
+                >
+                  <Box>
+                    <Typography fontWeight="medium">Ajouter un utilisateur</Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                      Créer un nouveau compte
+                    </Typography>
+                  </Box>
+                </Button>
+                
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="success"
+                  startIcon={<GroupAddIcon />}
+                  sx={{
+                    py: 2,
+                    justifyContent: 'flex-start',
+                    textAlign: 'left'
+                  }}
+                >
+                  <Box>
+                    <Typography fontWeight="medium">Créer une classe</Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                      Ajouter une nouvelle classe
+                    </Typography>
+                  </Box>
+                </Button>
+                
+                <Divider sx={{ my: 1 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Autres actions
+                  </Typography>
+                </Divider>
+                
+                <Grid container spacing={1}>
+                  {[
+                    { label: 'Gérer les matières', icon: <MenuBookIcon />, color: 'warning' },
+                    { label: 'Voir les statistiques', icon: <TrendingUpIcon />, color: 'info' },
+                    { label: 'Modérer les contenus', icon: <SchoolIcon />, color: 'secondary' },
+                  ].map((action) => (
+                    <Grid item xs={12} key={action.label}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={action.icon}
+                        sx={{ justifyContent: 'flex-start' }}
+                      >
+                        {action.label}
+                      </Button>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
