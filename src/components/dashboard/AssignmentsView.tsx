@@ -18,6 +18,10 @@ type Assignment = {
   };
 };
 
+type StudentData = {
+  class_id: string | null;
+};
+
 export default function AssignmentsView() {
   const { user } = useAuth();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -38,7 +42,7 @@ export default function AssignmentsView() {
         .from('students')
         .select('class_id')
         .eq('id', user.id)
-        .single();
+        .single() as { data: StudentData | null; error: any };
 
       if (!studentData || !studentData.class_id) {
         setLoading(false);
