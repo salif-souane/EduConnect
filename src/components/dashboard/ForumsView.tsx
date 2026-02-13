@@ -20,6 +20,10 @@ type Forum = {
   post_count?: number;
 };
 
+type StudentData = {
+  class_id: string | null;
+};
+
 export default function ForumsView() {
   const { user, profile } = useAuth();
   const [forums, setForums] = useState<Forum[]>([]);
@@ -50,13 +54,16 @@ export default function ForumsView() {
 
       // If user is a student, filter by their class or public forums
       if (profile?.role === 'student') {
-        const { data: studentData } = await supabase
+        // @ts-ignore Supabase type inference issue
+        const result = await supabase
           .from('students')
           .select('class_id')
           .eq('id', user.id)
-          .single();
+          .single() as { data: StudentData | null; error: any };
+        
+        const studentData = result.data;
 
-        if (studentData?.class_id) {
+        if (studentData && studentData.class_id) {
           query = query.or(`class_id.is.null,class_id.eq.${studentData.class_id}`);
         } else {
           query = query.is('class_id', null);
