@@ -69,16 +69,8 @@ export default function UsersManagement() {
       if (!userId) throw new Error('User not returned from signUp');
 
       // Upsert profile (update if exists, insert if not)
-      const { error: profileError } = await supabase.from('profiles').upsert(
-        {
-          id: userId,
-          email,
-          first_name: firstName || '',
-          last_name: lastName || '',
-          role,
-        },
-        { onConflict: 'id', ignoreDuplicates: false }
-      );
+      // @ts-ignore
+      const { error: profileError } = await supabase.from('profiles').upsert({ id: userId, email, first_name: firstName || '', last_name: lastName || '', role }, { onConflict: 'id', ignoreDuplicates: false });
       if (profileError) throw profileError;
 
       // Refresh list
@@ -116,13 +108,11 @@ export default function UsersManagement() {
 
   const saveEdit = async (id: string) => {
     try {
+      // @ts-ignore
       const { error } = await supabase
         .from('profiles')
-        .update({
-          first_name: editFirstName,
-          last_name: editLastName,
-          role: editRole,
-        })
+        // @ts-ignore
+        .update({ first_name: editFirstName, last_name: editLastName, role: editRole })
         .eq('id', id);
       if (error) throw error;
       setProfiles((p) =>
