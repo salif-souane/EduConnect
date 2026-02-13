@@ -19,6 +19,10 @@ type Course = {
   };
 };
 
+type StudentData = {
+  class_id: string | null;
+};
+
 export default function CoursesView() {
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -34,11 +38,13 @@ export default function CoursesView() {
       }
 
       // Get student's class
-      const { data: studentData } = await supabase
+      const result = await supabase
         .from('students')
         .select('class_id')
         .eq('id', user.id)
-        .single();
+        .single() as { data: StudentData | null; error: any };
+      
+      const studentData = result.data;
 
       if (!studentData || !studentData.class_id) {
         setLoading(false);
