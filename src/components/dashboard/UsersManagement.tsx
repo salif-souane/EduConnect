@@ -30,12 +30,27 @@ export default function UsersManagement() {
 
       const from = (pageNumber - 1) * pageSize;
       const to = from + pageSize - 1;
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .range(from, to);
-      if (error) throw error;
+      // Try the full query (with ordering). If PostgREST returns a 400 (Bad Request)
+      // retry without the `.order()` clause as some setups or policies may reject it.
+      let data: Profile[] | null = null;
+      try {
+        const res = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .range(from, to);
+        if (res.error) throw res.error;
+        data = res.data as Profile[] | null;
+      } catch (err: any) {
+        console.warn('profiles query with order failed, retrying without order:', err?.message || err);
+        // Retry without order (simpler query)
+        const res2 = await supabase
+          .from('profiles')
+          .select('*')
+          .range(from, to);
+        if (res2.error) throw res2.error;
+        data = res2.data as Profile[] | null;
+      }
       setProfiles(data || []);
     } catch (err) {
       console.error('Error loading profiles:', err);
