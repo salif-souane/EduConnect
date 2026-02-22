@@ -22,6 +22,7 @@ import ScheduleManagement from './dashboard/ScheduleManagement';
 import ScheduleView from './dashboard/ScheduleView';
 import ForumsManagement from './dashboard/ForumsManagement';
 import ForumsView from './dashboard/ForumsView';
+import StatisticsManagement from './dashboard/StatisticsManagement';
 
 export default function MainApp() {
   const { profile } = useAuth();
@@ -61,7 +62,7 @@ export default function MainApp() {
         case 'forums':
           return <ForumsManagement />;
         case 'statistics':
-          return <PlaceholderView title={currentView} />;
+          return <StatisticsManagement />;
         default:
           return <PlaceholderView title={currentView} />;
       }

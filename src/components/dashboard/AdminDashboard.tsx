@@ -25,6 +25,7 @@ import {
   PersonAdd as PersonAddIcon,
   GroupAdd as GroupAddIcon
 } from '@mui/icons-material';
+import Statistics from '../statistics/Statistics';
 
 interface Stats {
   totalUsers: number;
@@ -407,6 +408,12 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </Box>
-      </Container>
+      <Statistics initialStats={{
+        users: stats.totalUsers,
+        classes: stats.totalClasses,
+        subjects: stats.totalSubjects,
+        students: stats.totalStudents,
+      }} />
+    </Container>
   );
 }
