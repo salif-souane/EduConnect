@@ -77,8 +77,7 @@ export default function AdminDashboard() {
         supabase.from('students').select('id', { count: 'exact', head: true }),
         supabase
           .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false })
+          .select('id, email, first_name, last_name, role, created_at')
           .limit(5),
         supabase
           .from('classes')

@@ -55,6 +55,7 @@ export default function ScheduleManagement() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Form state
   const [classId, setClassId] = useState('');
@@ -107,8 +108,16 @@ export default function ScheduleManagement() {
       setClasses(classesRes.data || []);
       setSubjects(subjectsRes.data || []);
       setTeachers(teachersRes.data || []);
-    } catch (error) {
-      console.error('Error loading data:', error);
+    } catch (err) {
+      console.error('Error loading data:', err);
+      // Detect PostgREST specific missing-table error (PGRST205)
+      const code = (err as any)?.code;
+      if (code === 'PGRST205') {
+        setError("La table 'schedules' est introuvable sur le serveur. Vérifiez que les migrations ont été appliquées.");
+      } else {
+        const message = err instanceof Error ? err.message : String(err);
+        setError('Erreur lors du chargement: ' + message);
+      }
     } finally {
       setLoading(false);
     }
@@ -198,6 +207,16 @@ export default function ScheduleManagement() {
     acc[dayIndex] = schedules.filter(s => s.day_of_week === dayIndex);
     return acc;
   }, {} as Record<number, Schedule[]>);
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-red-200 p-6">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Erreur</h3>
+        <p className="text-sm text-red-700">{error}</p>
+        <p className="text-sm text-gray-600 mt-3">Si la table est manquante, exécutez la migration ou créez la table `schedules` dans votre projet Supabase.</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
