@@ -83,7 +83,6 @@ export default function AdminDashboard() {
         supabase
           .from('classes')
           .select('*')
-          .order('created_at', { ascending: false })
           .limit(5),
       ]);
 
