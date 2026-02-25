@@ -82,6 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
   };
 
+  // wait for auth.user row to replicate before touching dependent tables
+  // supabase can have eventual consistency delays; retry with exponential backoff
+  const ensureAuthUser = async () => {
+    await new Promise((r) => setTimeout(r, 2500));
+  };
+
   const signUp = async (
     email: string,
     password: string,
@@ -99,14 +105,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
     if (!data.user) throw new Error('No user returned');
 
-    const { error: profileError } = await supabase.from('profiles').insert({
-      id: data.user.id,
-      email,
-      first_name: userData.firstName,
-      last_name: userData.lastName,
-      role: userData.role,
-    });
+    // give the auth system time to persist the row before referencing it
+    await ensureAuthUser();
 
+    // Insert profile with retry logic for FK errors
+    let profileError: any = null;
+    const retryDelays = [3500, 5000, 7000]; // exponential backoff
+    for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+      const { error: err } = await supabase.from('profiles').insert({
+        id: data.user.id,
+        email,
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        role: userData.role,
+      });
+      if (!err) {
+        profileError = null;
+        break;
+      }
+      if (err.code === '23503') {
+        // FK error - retry with delay
+        if (attempt < retryDelays.length) {
+          const delay = retryDelays[attempt];
+          console.warn(`FK error on attempt ${attempt + 1}, retrying in ${delay}ms...`, err.details);
+          await new Promise((r) => setTimeout(r, delay));
+        } else {
+          profileError = err;
+          console.error('FK error persists after all retries:', err.details);
+        }
+      } else {
+        // non-FK error, don't retry
+        profileError = err;
+        break;
+      }
+    }
     if (profileError) throw profileError;
 
     if (userData.role === 'student') {

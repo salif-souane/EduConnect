@@ -19,6 +19,8 @@ export default function UsersManagement() {
   const [editFirstName, setEditFirstName] = useState('');
   const [editLastName, setEditLastName] = useState('');
   const [editRole, setEditRole] = useState<UserRole>('student');
+  const [showCredentials, setShowCredentials] = useState(false);
+  const [createdUserInfo, setCreatedUserInfo] = useState<{ email: string; password: string } | null>(null);
 
   const loadProfiles = useCallback(async (pageNumber = 1) => {
     setLoading(true);
@@ -63,6 +65,12 @@ export default function UsersManagement() {
     loadProfiles(page);
   }, [page, loadProfiles]);
 
+  // wait for auth.user row to replicate before touching dependent tables
+  // supabase can have eventual consistency delays; retry with exponential backoff
+  const waitForAuthUser = async () => {
+    await new Promise((r) => setTimeout(r, 2500));
+  };
+
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -83,15 +91,49 @@ export default function UsersManagement() {
       const userId = signData?.user?.id;
       if (!userId) throw new Error('User not returned from signUp');
 
-      // Upsert profile (update if exists, insert if not)
+      // give the auth system time to persist the row before referencing it
+      await waitForAuthUser();
+
+      // Upsert profile with retry logic for FK errors (exponential backoff)
       // @ts-ignore
-      const { error: profileError } = await supabase.from('profiles').upsert({ id: userId, email, first_name: firstName || '', last_name: lastName || '', role }, { onConflict: 'id', ignoreDuplicates: false });
+      let profileError: any = null;
+      const retryDelays = [3500, 5000, 7000]; // delays between retries in ms
+      for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+        const { error: err } = await supabase.from('profiles').upsert(
+          { id: userId, email, first_name: firstName || '', last_name: lastName || '', role },
+          { onConflict: 'id', ignoreDuplicates: false }
+        );
+        if (!err) {
+          // success
+          profileError = null;
+          break;
+        }
+        if (err.code === '23503') {
+          // foreign key error - auth row may not be visible yet
+          if (attempt < retryDelays.length) {
+            const delay = retryDelays[attempt];
+            console.warn(`FK error on attempt ${attempt + 1}, retrying in ${delay}ms...`, err.details);
+            await new Promise((r) => setTimeout(r, delay));
+          } else {
+            profileError = err;
+            console.error('FK error persists after all retries:', err.details);
+          }
+        } else {
+          // non-FK error, don't retry
+          profileError = err;
+          break;
+        }
+      }
       if (profileError) throw profileError;
+
+      // Store credentials to show to admin
+      setCreatedUserInfo({ email, password });
+      setShowCredentials(true);
 
       // Refresh list
       await loadProfiles(1);
       setEmail(''); setPassword('Demo123!'); setFirstName(''); setLastName(''); setRole('student');
-      alert("Utilisateur créé. S'il y a une confirmation d'email activée, confirmez le compte via Dashboard.");
+      // alert removed - we show modal instead
     } catch (err) {
       console.error('Error creating user:', err);
       alert('Erreur lors de la création de l\'utilisateur: ' + (err instanceof Error ? err.message : err));
@@ -244,6 +286,68 @@ export default function UsersManagement() {
           </tbody>
         </table>
       </div>
+
+      {/* Modal: Afficher les identifiants créés */}
+      {showCredentials && createdUserInfo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div className="text-center mb-6">
+              <div className="inline-block p-2 bg-green-100 rounded-full mb-3">
+                <span className="text-2xl">✓</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Utilisateur créé avec succès</h3>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-600 uppercase">Email</label>
+                <div className="flex items-center justify-between mt-1">
+                  <code className="text-sm font-mono text-gray-900 break-all">{createdUserInfo.email}</code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(createdUserInfo.email);
+                      alert('Email copié !');
+                    }}
+                    className="ml-2 text-blue-600 hover:text-blue-700 text-sm"
+                  >
+                    Copier
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-600 uppercase">Mot de passe temporaire</label>
+                <div className="flex items-center justify-between mt-1">
+                  <code className="text-sm font-mono text-gray-900">{createdUserInfo.password}</code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(createdUserInfo.password);
+                      alert('Mot de passe copié !');
+                    }}
+                    className="ml-2 text-blue-600 hover:text-blue-700 text-sm"
+                  >
+                    Copier
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 text-sm text-blue-800">
+              <strong>📧 Informez l'utilisateur :</strong> Il recevra un email de confirmation de Supabase pour valider son compte. Une fois validé, il pourra se connecter avec ces identifiants ou utiliser le lien du mail.
+            </div>
+
+            <button
+              onClick={() => {
+                setShowCredentials(false);
+                setCreatedUserInfo(null);
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

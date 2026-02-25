@@ -78,6 +78,7 @@ export default function AdminDashboard() {
         supabase
           .from('profiles')
           .select('id, email, first_name, last_name, role, created_at')
+          .order('created_at', { ascending: false })
           .limit(5),
         supabase
           .from('classes')
