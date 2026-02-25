@@ -42,11 +42,20 @@ export default function ParentDashboard() {
 
       if (error) throw error;
 
-      const formattedChildren = data?.map((item) => ({
-        id: item.students.id,
-        profiles: item.students.profiles,
-        classes: item.students.classes,
-      })) || [];
+      const formattedChildren = data?.map((item: any) => {
+        const profileData = Array.isArray(item.students.profiles)
+          ? item.students.profiles[0]
+          : item.students.profiles;
+        const classData = Array.isArray(item.students.classes)
+          ? item.students.classes[0]
+          : item.students.classes;
+
+        return {
+          id: item.students.id,
+          profiles: profileData,
+          classes: classData,
+        };
+      }) || [];
 
       setChildren(formattedChildren);
     } catch (error) {

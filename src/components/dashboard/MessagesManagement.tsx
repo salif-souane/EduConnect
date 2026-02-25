@@ -95,7 +95,6 @@ export default function MessagesManagement() {
     try {
       const { error } = await supabase
         .from('messages')
-        // @ts-expect-error Supabase type generation issue
         .insert({
           sender_id: user.id,
           recipient_id: recipientId,
@@ -123,7 +122,6 @@ export default function MessagesManagement() {
     try {
       const { error } = await supabase
         .from('messages')
-        // @ts-expect-error Supabase type generation issue
         .update({ read: true, read_at: new Date().toISOString() })
         .eq('id', messageId)
         .eq('recipient_id', user.id);

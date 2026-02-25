@@ -39,7 +39,10 @@ type Teacher = {
   profiles?: {
     first_name: string;
     last_name: string;
-  };
+  } | {
+    first_name: string;
+    last_name: string;
+  }[];
 };
 
 const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -97,13 +100,7 @@ export default function ScheduleManagement() {
         supabase.from('subjects').select('id, name').order('name'),
         supabase
           .from('teachers')
-          .select(`
-            id,
-            profiles (
-              first_name,
-              last_name
-            )
-          `)
+          .select('id, profiles!inner(first_name, last_name)')
           .order('profiles.first_name')
       ]);
 
@@ -158,14 +155,12 @@ export default function ScheduleManagement() {
       if (editingId) {
         const { error } = await supabase
           .from('schedules')
-          // @ts-expect-error Supabase type generation issue
           .update(scheduleData)
           .eq('id', editingId);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('schedules')
-          // @ts-expect-error Supabase type generation issue
           .insert(scheduleData);
         if (error) throw error;
       }
@@ -284,11 +279,16 @@ export default function ScheduleManagement() {
                   required
                 >
                   <option value="">Sélectionner un enseignant</option>
-                  {teachers.map((teacher) => (
-                    <option key={teacher.id} value={teacher.id}>
-                      {teacher.profiles?.first_name} {teacher.profiles?.last_name}
-                    </option>
-                  ))}
+                  {teachers.map((teacher) => {
+                    const profile = Array.isArray(teacher.profiles)
+                      ? teacher.profiles[0]
+                      : teacher.profiles;
+                    return (
+                      <option key={teacher.id} value={teacher.id}>
+                        {profile?.first_name} {profile?.last_name}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 

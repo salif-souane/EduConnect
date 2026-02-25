@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from './database.types';
 
 // Read Vite-injected environment variables. They must be prefixed with `VITE_`.
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -11,4 +10,4 @@ if (typeof supabaseUrl !== 'string' || supabaseUrl.trim() === '' || typeof supab
   );
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);

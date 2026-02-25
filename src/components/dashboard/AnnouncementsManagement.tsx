@@ -128,14 +128,13 @@ export default function AnnouncementsManagement() {
       if (editingId) {
         const { error } = await supabase
           .from('announcements')
-          // @ts-expect-error Supabase type generation issue
+        
           .update(announcementData)
           .eq('id', editingId);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('announcements')
-          // @ts-expect-error Supabase type generation issue
           .insert(announcementData);
         if (error) throw error;
       }

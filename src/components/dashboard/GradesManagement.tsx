@@ -25,7 +25,10 @@ type Student = {
   profiles?: {
     first_name: string;
     last_name: string;
-  };
+  } | {
+    first_name: string;
+    last_name: string;
+  }[];
 };
 
 type Subject = {
@@ -83,13 +86,7 @@ export default function GradesManagement() {
       const [studentsRes, subjectsRes] = await Promise.all([
         supabase
           .from('students')
-          .select(`
-            id,
-            profiles (
-              first_name,
-              last_name
-            )
-          `)
+          .select('id, profiles!inner(first_name, last_name)')
           .order('profiles.first_name'),
         supabase.from('subjects').select('id, name').order('name')
       ]);
@@ -144,14 +141,12 @@ export default function GradesManagement() {
       if (editingId) {
         const { error } = await supabase
           .from('grades')
-          // @ts-expect-error Supabase type generation issue
           .update(gradeData)
           .eq('id', editingId);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('grades')
-          // @ts-expect-error Supabase type generation issue
           .insert(gradeData);
         if (error) throw error;
       }
@@ -239,11 +234,16 @@ export default function GradesManagement() {
                   required
                 >
                   <option value="">Sélectionner un élève</option>
-                  {students.map((student) => (
-                    <option key={student.id} value={student.id}>
-                      {student.profiles?.first_name} {student.profiles?.last_name}
-                    </option>
-                  ))}
+                  {students.map((student) => {
+                    const profile = Array.isArray(student.profiles) 
+                      ? student.profiles[0] 
+                      : student.profiles;
+                    return (
+                      <option key={student.id} value={student.id}>
+                        {profile?.first_name} {profile?.last_name}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 

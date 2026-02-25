@@ -133,14 +133,12 @@ export default function AssignmentsManagement() {
       if (editingId) {
         const { error } = await supabase
           .from('assignments')
-          // @ts-expect-error Supabase type generation issue
           .update(assignmentData)
           .eq('id', editingId);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('assignments')
-          // @ts-expect-error Supabase type generation issue
           .insert(assignmentData);
         if (error) throw error;
       }

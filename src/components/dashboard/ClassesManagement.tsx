@@ -47,10 +47,21 @@ export default function ClassesManagement() {
   const createClass = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabase.from('classes').insert({ name, level, academic_year: year }).select().single();
+      const { data, error } = await supabase
+        .from('classes')
+        .insert({
+          name: name,
+          level: level,
+          academic_year: year
+        })
+        .select()
+        .single();
       if (error) throw error;
-      setClasses((c) => [data, ...c]);
-      setName(''); setLevel('');
+      if (data) {
+        setClasses((c) => [data, ...c]);
+      }
+      setName(''); 
+      setLevel('');
     } catch (err) {
       console.error(err);
       alert('Erreur lors de la création de la classe');
@@ -68,7 +79,14 @@ export default function ClassesManagement() {
 
   const saveEdit = async (id: string) => {
     try {
-      const { error } = await supabase.from('classes').update({ name: editName, level: editLevel, academic_year: editYear }).eq('id', id);
+      const { error } = await supabase
+        .from('classes')
+        .update({
+          name: editName,
+          level: editLevel,
+          academic_year: editYear
+        })
+        .eq('id', id);
       if (error) throw error;
       setClasses((c) => c.map((x) => (x.id === id ? { ...x, name: editName, level: editLevel, academic_year: editYear } : x)));
       setEditingId(null);

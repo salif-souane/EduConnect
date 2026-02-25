@@ -43,6 +43,14 @@ interface Profile {
   created_at: string;
 }
 
+interface Class {
+  id: string;
+  name: string;
+  level: string;
+  academic_year: string;
+  created_at: string;
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
@@ -51,7 +59,9 @@ export default function AdminDashboard() {
     totalStudents: 0,
   });
   const [recentUsers, setRecentUsers] = useState<Profile[]>([]);
+  const [recentClasses, setRecentClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadStats();
@@ -59,7 +69,8 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const [usersRes, classesRes, subjectsRes, studentsRes, recentUsersRes] = await Promise.all([
+      setError(null);
+      const [usersRes, classesRes, subjectsRes, studentsRes, recentUsersRes, recentClassesRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('classes').select('id', { count: 'exact', head: true }),
         supabase.from('subjects').select('id', { count: 'exact', head: true }),
@@ -69,7 +80,21 @@ export default function AdminDashboard() {
           .select('*')
           .order('created_at', { ascending: false })
           .limit(5),
+        supabase
+          .from('classes')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5),
       ]);
+
+      console.log('Recent classes data:', recentClassesRes);
+      console.log('Recent classes error:', recentClassesRes.error);
+      console.log('Classes count:', classesRes.count);
+
+      if (recentClassesRes.error) {
+        console.error('Error fetching classes:', recentClassesRes.error);
+        setError(`Erreur lors du chargement des classes: ${recentClassesRes.error.message}`);
+      }
 
       setStats({
         totalUsers: usersRes.count || 0,
@@ -78,8 +103,10 @@ export default function AdminDashboard() {
         totalStudents: studentsRes.count || 0,
       });
       setRecentUsers(recentUsersRes.data || []);
+      setRecentClasses(recentClassesRes.data || []);
     } catch (error) {
       console.error('Error loading stats:', error);
+      setError(`Erreur lors du chargement: ${error}`);
     } finally {
       setLoading(false);
     }
@@ -195,6 +222,12 @@ export default function AdminDashboard() {
         </Typography>
       </Box>
 
+      {error && (
+        <Paper sx={{ p: 2, mb: 3, bgcolor: 'error.light', borderLeft: 4, borderColor: 'error.main' }}>
+          <Typography color="error">{error}</Typography>
+        </Paper>
+      )}
+
       {/* Cartes de statistiques */}
       <Box
         sx={{
@@ -255,7 +288,7 @@ export default function AdminDashboard() {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: '1.4fr 1fr' },
+          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
           gap: 3,
         }}
       >
@@ -335,8 +368,76 @@ export default function AdminDashboard() {
             </CardActions>
           </Card>
 
-        {/* Actions rapides */}
+        {/* Classes récentes */}
         <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
+                Classes récentes
+              </Typography>
+              
+              {recentClasses.length === 0 ? (
+                <Paper
+                  sx={{
+                    p: 4,
+                    textAlign: 'center',
+                    bgcolor: 'action.hover',
+                    borderRadius: 2
+                  }}
+                >
+                  <SchoolIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                  <Typography color="text.secondary">
+                    Aucune classe créée pour le moment
+                  </Typography>
+                </Paper>
+              ) : (
+                <Stack spacing={2}>
+                  {recentClasses.map((cls) => (
+                    <Paper
+                      key={cls.id}
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'background-color 0.2s',
+                        '&:hover': {
+                          bgcolor: 'action.hover'
+                        }
+                      }}
+                    >
+                      <Stack direction="row" alignItems="center" spacing={2} sx={{ flex: 1 }}>
+                        <Avatar sx={{ bgcolor: 'warning.main' }}>
+                          <SchoolIcon />
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle1" fontWeight="medium">
+                            {cls.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {cls.level} • {cls.academic_year}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Paper>
+                  ))}
+                </Stack>
+              )}
+            </CardContent>
+            <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+              <Button 
+                endIcon={<ArrowForwardIcon />}
+                variant="text"
+                color="primary"
+              >
+                Voir toutes les classes
+              </Button>
+            </CardActions>
+          </Card>
+      </Box>
+
+      {/* Actions rapides */}
+      <Card sx={{ height: '100%', mt: 3 }}>
             <CardContent>
               <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
                 Actions rapides
@@ -407,7 +508,6 @@ export default function AdminDashboard() {
               </Stack>
             </CardContent>
           </Card>
-        </Box>
       <Statistics initialStats={{
         users: stats.totalUsers,
         classes: stats.totalClasses,

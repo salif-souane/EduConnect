@@ -129,14 +129,12 @@ export default function CoursesManagement() {
       if (editingId) {
         const { error } = await supabase
           .from('courses')
-          // @ts-expect-error Supabase type generation issue
           .update(courseData)
           .eq('id', editingId);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('courses')
-          // @ts-expect-error Supabase type generation issue
           .insert(courseData);
         if (error) throw error;
       }
