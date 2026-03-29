@@ -101,7 +101,7 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
                 onClick={() => onViewChange(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
                   currentView === item.id
-                    ? 'bg-blue-50 text-blue-700 font-medium'
+                    ? 'bg-blue-50 text-green-500 font-medium'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
