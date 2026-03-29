@@ -118,7 +118,7 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
           <p className="text-sm font-medium text-gray-900">
             {profile?.first_name} {profile?.last_name}
           </p>
-          <p className="text-xs text-gray-500">{profile?.email}</p>
+          <p className="text-xs text-gray-500">{profile?.role}</p>
         </div>
 
         <button
