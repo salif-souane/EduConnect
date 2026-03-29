@@ -115,9 +115,10 @@ export default function StudentDashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          Mon tableau de bord
-        </h2>
+         <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Dashboard</span>{" "}
+  <span className="text-green-500">etudiant</span>
+</h2>
         <p className="text-gray-600">
           {studentData?.classes?.name || 'Classe non assignée'}
         </p>

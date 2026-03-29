@@ -103,9 +103,10 @@ export default function ParentDashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          Espace parent
-        </h2>
+         <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Dashboard</span>{" "}
+  <span className="text-green-500">parent</span>
+</h2>
         <p className="text-gray-600">
           Suivez la scolarité de vos enfants
         </p>
