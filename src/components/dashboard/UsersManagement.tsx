@@ -194,7 +194,10 @@ export default function UsersManagement() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gestion des utilisateurs</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Gestion des</span>{" "}
+  <span className="text-green-500">utilisateurs</span>
+</h2>
       </div>
 
       <form onSubmit={createUser} className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-3">

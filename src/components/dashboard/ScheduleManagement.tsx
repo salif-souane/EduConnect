@@ -229,7 +229,10 @@ export default function ScheduleManagement() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gestion de l'emploi du temps</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Gestion</span>{" "}
+  <span className="text-green-500">de l'emploi du temps</span>
+</h2>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"

@@ -118,7 +118,10 @@ export default function GradesView() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold">Mes notes</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Mes</span>{" "}
+  <span className="text-green-500">notes</span>
+</h2>
         <p className="text-gray-600 mt-2">Consultez toutes vos évaluations</p>
       </div>
 

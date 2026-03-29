@@ -183,7 +183,10 @@ export default function AnnouncementsManagement() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gestion des annonces</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Gestion des</span>{" "}
+  <span className="text-green-500">annonces</span>
+</h2>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"

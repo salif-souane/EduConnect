@@ -94,8 +94,11 @@ export default function SubjectsManagement() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gestion des matières</h2>
-      </div>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Gestion des</span>{" "}
+  <span className="text-green-500">matières</span>
+</h2>
+       </div>
 
       <form onSubmit={createSubject} className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom de la matière" required className="px-3 py-2 border rounded" />
