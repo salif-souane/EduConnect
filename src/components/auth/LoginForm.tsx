@@ -57,13 +57,14 @@ export default function LoginForm() {
           <>
             <div className="text-center mb-8">
               <div className="inline-block p-3 bg-blue-100 rounded-full mb-4">
-                <LogIn className="w-8 h-8 text-blue-600" />
+                <LogIn className="w-8 h-8 text-green-500" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Plateforme Éducative
-              </h1>
+              <h1 className="text-lg font-bold text-gray-900">
+  <span className="text-black">KAARAAN</span>
+  <span className="text-green-500">DULA</span>
+</h1>
               <p className="text-gray-600">
-                Connexion à votre espace
+                connexion 
               </p>
             </div>
 

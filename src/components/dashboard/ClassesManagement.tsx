@@ -115,7 +115,10 @@ export default function ClassesManagement() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gestion des classes</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Gestion des</span>{" "}
+  <span className="text-green-500">classes</span>
+</h2>
       </div>
 
       <form onSubmit={createClass} className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">

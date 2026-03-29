@@ -75,8 +75,11 @@ export default function StatisticsManagement() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Statistiques détaillées</h2>
-        <div className="text-sm text-gray-600">Mise à jour automatique depuis Supabase</div>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Statistiques</span>{" "}
+  <span className="text-green-500">détaillées</span>
+</h2>
+         <div className="text-sm text-gray-600">Mise à jour automatique depuis Supabase</div>
       </div>
 
       <div className="mb-4 flex items-center space-x-3">

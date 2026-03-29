@@ -118,7 +118,10 @@ export default function AssignmentsView() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold">Mes devoirs</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Mes</span>{" "}
+  <span className="text-green-500">devoirs</span>
+</h2>
         <p className="text-gray-600 mt-2">Consultez vos devoirs et leurs échéances</p>
       </div>
 

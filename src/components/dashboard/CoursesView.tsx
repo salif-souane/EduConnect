@@ -93,7 +93,10 @@ export default function CoursesView() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold">Mes cours</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Mes</span>{" "}
+  <span className="text-green-500">cours</span>
+</h2>
         <p className="text-gray-600 mt-2">Accédez aux cours publiés par vos professeurs</p>
       </div>
 

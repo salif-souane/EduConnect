@@ -213,13 +213,25 @@ export default function AdminDashboard() {
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* En-tête */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-          Tableau de bord administrateur
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Vue d'ensemble de la plateforme éducative et statistiques
-        </Typography>
-      </Box>
+  <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+    <Box component="span" sx={{ color: "black" }}>
+      Dashboard
+    </Box>{" "}
+    <Box component="span" sx={{ color: "#22c55e" }}>
+      administrateur
+    </Box>
+  </Typography>
+
+  <Typography variant="body1" color="text.secondary">
+    Vue d'ensemble de la plateforme{" "}
+    <Box component="span" sx={{ color: "black", fontWeight: "bold" }}>
+      KAARAAN
+    </Box>
+    <Box component="span" sx={{ color: "#22c55e", fontWeight: "bold" }}>
+      DULA
+    </Box>
+  </Typography>
+</Box>
 
       {error && (
         <Paper sx={{ p: 2, mb: 3, bgcolor: 'error.light', borderLeft: 4, borderColor: 'error.main' }}>

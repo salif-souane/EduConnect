@@ -86,9 +86,10 @@ export default function TeacherDashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          Tableau de bord enseignant
-        </h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Dashboard</span>{" "}
+  <span className="text-green-500">enseignant</span>
+</h2>
         <p className="text-gray-600">
           Gérez vos cours, devoirs et communications
         </p>

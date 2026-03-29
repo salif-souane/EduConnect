@@ -99,7 +99,10 @@ export default function ScheduleView() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Mon emploi du temps</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Mon emploi du </span>{" "}
+  <span className="text-green-500">temps</span>
+</h2>
       </div>
 
       {schedules.length === 0 ? (

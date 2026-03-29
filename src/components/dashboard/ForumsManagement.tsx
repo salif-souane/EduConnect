@@ -181,7 +181,10 @@ export default function ForumsManagement() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold">Gestion des forums</h2>
+          <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Gestion des</span>{" "}
+  <span className="text-green-500">forums</span>
+</h2>
           <p className="text-gray-600 mt-2">Créez et gérez les forums de discussion</p>
         </div>
         <button

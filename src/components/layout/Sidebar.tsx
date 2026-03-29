@@ -80,11 +80,12 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
     <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <School className="w-6 h-6 text-blue-600" />
-          </div>
+          
           <div>
-            <h1 className="text-lg font-bold text-gray-900">EduConnect</h1>
+            <h1 className="text-lg font-bold text-gray-900">
+  <span className="text-black ">KAARAAN</span>
+  <span className="text-green-500">DULA</span>
+</h1>
             <p className="text-xs text-gray-500 capitalize">{profile?.role}</p>
           </div>
         </div>
@@ -100,7 +101,7 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
                 onClick={() => onViewChange(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
                   currentView === item.id
-                    ? 'bg-blue-50 text-blue-700 font-medium'
+                    ? 'bg-blue-50 text-green-500 font-medium'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -117,7 +118,7 @@ export default function Sidebar({ currentView, onViewChange }: SidebarProps) {
           <p className="text-sm font-medium text-gray-900">
             {profile?.first_name} {profile?.last_name}
           </p>
-          <p className="text-xs text-gray-500">{profile?.email}</p>
+          <p className="text-xs text-gray-500">{profile?.role}</p>
         </div>
 
         <button

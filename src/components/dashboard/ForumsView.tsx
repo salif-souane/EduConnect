@@ -104,7 +104,10 @@ export default function ForumsView() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold">Forums de discussion</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Forums de</span>{" "}
+  <span className="text-green-500">discissions</span>
+</h2>
         <p className="text-gray-600 mt-2">Échangez avec vos camarades et enseignants</p>
       </div>
 

@@ -165,7 +165,10 @@ export default function MessagesManagement() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Messages privés</h2>
+        <h2 className="text-3xl font-bold mb-2">
+  <span className="text-black">Messages</span>{" "}
+  <span className="text-green-500">privés</span>
+</h2>
         <button
           onClick={() => setShowCompose(true)}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
